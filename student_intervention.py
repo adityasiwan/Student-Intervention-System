@@ -7,7 +7,6 @@ from sklearn.metrics import f1_score
 student_data = pd.read_csv("student-data.csv")
 print "Student data read successfully!"
 
-
 n_students = len(student_data.index)
 
 n_features = len(student_data.columns)-1
@@ -37,11 +36,7 @@ y_all = student_data[target_col]
 print "\nFeature values:"
 print X_all.head()
 
-
 def preprocess_features(X):
-    ''' Preprocesses the student data and converts non-numeric binary variables into
-        binary (0/1) variables. Converts categorical variables into dummy variables. '''
-    
     output = pd.DataFrame(index = X.index)
 
     for col, col_data in X.iteritems():
@@ -59,7 +54,6 @@ def preprocess_features(X):
 X_all = preprocess_features(X_all)
 print "Processed feature columns ({} total features):\n{}".format(len(X_all.columns), list(X_all.columns))
 
-
 from sklearn.cross_validation import train_test_split
 
 num_train = 300
@@ -71,10 +65,7 @@ X_train, X_test, y_train, y_test = train_test_split(X_all, y_all, train_size=num
 print "Training set has {} samples.".format(X_train.shape[0])
 print "Testing set has {} samples.".format(X_test.shape[0])
 
-
 def train_classifier(clf, X_train, y_train):
-    ''' Fits a classifier to the training data. '''
-    
     start = time()
     clf.fit(X_train, y_train)
     end = time()
@@ -83,8 +74,6 @@ def train_classifier(clf, X_train, y_train):
 
     
 def predict_labels(clf, features, target):
-    ''' Makes predictions using a fit classifier based on F1 score. '''
-    
     start = time()
     y_pred = clf.predict(features)
     end = time()
@@ -94,8 +83,6 @@ def predict_labels(clf, features, target):
 
 
 def train_predict(clf, X_train, y_train, X_test, y_test):
-    ''' Train and predict using a classifer based on F1 score. '''
-    
     print "Training a {} using a training set size of {}. . .".format(clf.__class__.__name__, len(X_train))
     
     train_classifier(clf, X_train, y_train)
@@ -109,30 +96,16 @@ from sklearn import tree
 from sklearn import svm
 from sklearn.naive_bayes import GaussianNB
 
-clf_A = tree.DecisionTreeClassifier()
-clf_B = svm.SVC()
+clf_A = tree.DecisionTreeClassifier(random_state=42)
+clf_B = svm.SVC(random_state=42)
 clf_C = GaussianNB()
 
-X_train_100 = X_train.sample(n=100)
-y_train_100 = y_train.sample(n=100)
-
-X_train_200 = X_train.sample(n=200)
-y_train_200 = y_train.sample(n=200)
-
-X_train_300 = X_train.sample(n=300)
-y_train_300 = y_train.sample(n=300)
-
-
-train_predict(clf_A, X_train_100, y_train_100, X_test, y_test)
-train_predict(clf_A, X_train_200, y_train_200, X_test, y_test)
-train_predict(clf_A, X_train_300, y_train_300, X_test, y_test)
-train_predict(clf_B, X_train_100, y_train_100, X_test, y_test)
-train_predict(clf_B, X_train_200, y_train_200, X_test, y_test)
-train_predict(clf_B, X_train_300, y_train_300, X_test, y_test)
-train_predict(clf_C, X_train_100, y_train_100, X_test, y_test)
-train_predict(clf_C, X_train_200, y_train_200, X_test, y_test)
-train_predict(clf_C, X_train_300, y_train_300, X_test, y_test)
-
+for size in [100, 200, 300]:
+    train_predict(clf_A, X_train[:size], y_train[:size], X_test, y_test)
+for size in [100, 200, 300]:
+    train_predict(clf_B, X_train[:size], y_train[:size], X_test, y_test)
+for size in [100, 200, 300]:
+    train_predict(clf_C, X_train[:size], y_train[:size], X_test, y_test)
 
 from sklearn import svm, grid_search, datasets
 from sklearn.metrics import make_scorer
